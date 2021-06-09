@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import Summary from "./Summary";
 
@@ -6,35 +6,35 @@ const Detail = (props) => {
   const [loadedPokemon, setLoadedPokemon] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      console.log(
-        "Sending Http request for new pokemon with name " +
-          props.selectedPokemon
+  const fetchData = useCallback(async () => {
+    console.log(
+      "Sending Http request for new pokemon with name " + props.selectedPokemon
+    );
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `https://pokeapi.co/api/v2/pokemon/${props.selectedPokemon}`
       );
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `https://pokeapi.co/api/v2/pokemon/${props.selectedPokemon}`
-        );
-        const pokeData = await response.json();
+      const pokeData = await response.json();
 
-        const loadedPokemon = {
-          image: `https://img.pokemondb.net/artwork/large/${pokeData.name}.jpg`,
-          name: pokeData.name,
-          height: pokeData.height,
-          weight: pokeData.weight,
-          type: pokeData.types[0].type.name,
-          movesCount: pokeData.moves.length,
-        };
-        setIsLoading(false);
-        setLoadedPokemon(loadedPokemon);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchData();
+      const loadedPokemon = {
+        image: `https://img.pokemondb.net/artwork/large/${pokeData.name}.jpg`,
+        name: pokeData.name,
+        height: pokeData.height,
+        weight: pokeData.weight,
+        type: pokeData.types[0].type.name,
+        movesCount: pokeData.moves.length,
+      };
+      setIsLoading(false);
+      setLoadedPokemon(loadedPokemon);
+    } catch (error) {
+      console.log(error);
+    }
   }, [props.selectedPokemon]);
+
+  useEffect(() => {
+    fetchData();
+  }, [props.selectedPokemon, fetchData]);
 
   useEffect(() => () => console.log("Too soon..."), []);
 
