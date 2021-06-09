@@ -7,37 +7,36 @@ const Detail = (props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchData();
-    return () => {
-      console.log("Too soon...");
+    const fetchData = async () => {
+      console.log(
+        "Sending Http request for new pokemon with name " +
+          props.selectedPokemon
+      );
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `https://pokeapi.co/api/v2/pokemon/${props.selectedPokemon}`
+        );
+        const pokeData = await response.json();
+
+        const loadedPokemon = {
+          image: `https://img.pokemondb.net/artwork/large/${pokeData.name}.jpg`,
+          name: pokeData.name,
+          height: pokeData.height,
+          weight: pokeData.weight,
+          type: pokeData.types[0].type.name,
+          movesCount: pokeData.moves.length,
+        };
+        setIsLoading(false);
+        setLoadedPokemon(loadedPokemon);
+      } catch (error) {
+        console.log(error);
+      }
     };
+    fetchData();
   }, [props.selectedPokemon]);
 
-  const fetchData = async () => {
-    console.log(
-      "Sending Http request for new pokemon with name " + props.selectedPokemon
-    );
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `https://pokeapi.co/api/v2/pokemon/${props.selectedPokemon}`
-      );
-      const pokeData = await response.json();
-
-      const loadedPokemon = {
-        image: `https://img.pokemondb.net/artwork/large/${pokeData.name}.jpg`,
-        name: pokeData.name,
-        height: pokeData.height,
-        weight: pokeData.weight,
-        type: pokeData.types[0].type.name,
-        movesCount: pokeData.moves.length,
-      };
-      setIsLoading(false);
-      setLoadedPokemon(loadedPokemon);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  useEffect(() => () => console.log("Too soon..."), []);
 
   let content = <p>Loading Detail...</p>;
 
